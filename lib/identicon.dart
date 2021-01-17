@@ -12,6 +12,7 @@ var colourCache = Map<String, List<List<int>>>();
 class Identicon {
   int _rows;
   int _cols;
+  Random _random;
 
   Function(List<int>) _digest;
 
@@ -35,7 +36,7 @@ class Identicon {
       while (!coloursOk) {
         this._fgColour = this._getPastelColour();
         if (this._bgColour == null) {
-          this._bgColour = this._getPastelColour(lighten: 80);
+          this._bgColour = this._getPastelColour(lighten: 30);
 
           var fgLum = this._luminance(this._fgColour) + 0.05;
           var bgLum = this._luminance(this._bgColour) + 0.05;
@@ -51,7 +52,7 @@ class Identicon {
   }
 
   _getPastelColour({int lighten = 127}) {
-    var r = () => Random().nextInt(128) + lighten;
+    var r = () => _random.nextInt(128) + lighten;
     return [r(), r(), r()];
   }
 
@@ -120,6 +121,7 @@ class Identicon {
   Uint8List generate(String text, {int size = 36}) {
     var bytesLength = 16;
     var hexDigest = this._digest(utf8.encode(text)).toString();
+    _random = Random(hexDigest.hashCode);
 
     var hexDigestByteList = List<int>.generate(bytesLength, (int i) {
       return int.parse(hexDigest.substring(i * 2, i * 2 + 2),
